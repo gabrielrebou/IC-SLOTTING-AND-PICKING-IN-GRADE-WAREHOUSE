@@ -85,7 +85,8 @@ src/
 │
 ├── Results/                   # [Ignorado] Saídas brutas, logs e resultados gerados
 │
-├── Results_compare/           # [Ignorado] Relatórios e scripts de comparação de resultados
+├── Results_compare/           # Relatórios e scripts de comparação de resultados
+│   └── compare_graphs/        # Gráficos com os resultados 
 │
 ├── slotting/                  # Estratégias de alocação de produtos em gôndolas (Slotting)
 │

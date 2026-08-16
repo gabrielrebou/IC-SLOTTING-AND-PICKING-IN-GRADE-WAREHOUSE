@@ -47,7 +47,7 @@ echo -e "${YELLOW}[2/3] Verificando e instalando pacotes necessários...${NC}"
 
 cat > setup_temp.jl << 'EOF'
 using Pkg
-packages = ["Plots", "Graphs", "HiGHS", "JuMP", "Clustering"]
+packages = ["Plots", "Graphs", "HiGHS", "JuMP", "Clustering", "CSV"]
 to_install = String[]
 
 for pkg in packages
@@ -81,7 +81,7 @@ fi
 echo -e "${YELLOW}[3/3] Validação final de importação...${NC}"
 
 cat > val_temp.jl << 'EOF'
-libs = ["LinearAlgebra", "Statistics", "Plots", "Graphs", "HiGHS", "JuMP", "SparseArrays", "Random", "Clustering"]
+libs = ["LinearAlgebra", "Statistics", "Plots", "Graphs", "HiGHS", "JuMP", "SparseArrays", "Random", "Clustering", "CSV"]
 all_ok = true
 for lib in libs
     try

@@ -58,7 +58,7 @@ for data_id in 1:length(data_names)
         allocation_bytes = mark.bytes
 
         if isempty(mark.value)
-            print_pickers(Pickers[], do_abc, do_allocation, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, 0, 0, 0, 0)
+            print_pickers(Pickers[], do_allocation, do_abc, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, 0, 0, 0, 0)
             continue
         end
 
@@ -76,7 +76,7 @@ for data_id in 1:length(data_names)
 
         all_pickers = reduce(vcat, max_route)
 
-        print_pickers(all_pickers, do_abc, do_allocation, do_message_passing, false, data_names[data_id], data_id, allocation_time, allocation_bytes, route_time, route_bytes, 0, 0)
+        print_pickers(all_pickers, do_allocation, do_abc, do_message_passing, false, data_names[data_id], data_id, allocation_time, allocation_bytes, route_time, route_bytes, 0, 0)
 
         sku_volume = [sku.volume for sku in skus]
 
@@ -89,7 +89,7 @@ for data_id in 1:length(data_names)
             depot_id
         )
 
-        print_pickers(merged_pickers, do_abc, do_allocation, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, route_time, route_bytes, cw_time, cw_bytes)
+        print_pickers(merged_pickers, do_allocation, do_abc, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, route_time, route_bytes, cw_time, cw_bytes)
     
         results_dir = joinpath(@__DIR__, "Results")
         compare_dir = joinpath(@__DIR__, "Results_compare")
