@@ -58,7 +58,7 @@ for data_id in 1:length(data_names)
         allocation_bytes = mark.bytes
 
         if isempty(mark.value)
-            print_pickers([], do_abc, do_allocation, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, 0, 0, 0, 0)
+            print_pickers(Pickers[], do_abc, do_allocation, do_message_passing, true, data_names[data_id], data_id, allocation_time, allocation_bytes, 0, 0, 0, 0)
             continue
         end
 
