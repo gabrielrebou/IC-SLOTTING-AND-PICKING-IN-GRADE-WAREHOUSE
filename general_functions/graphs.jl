@@ -59,12 +59,10 @@ function warehouse_graph(warehouse::Warehouse)
         annotate!(x[i], y[i] - 0.3, text(labels[i], 8, :center))
     end
 
-    results_dir = joinpath(@__DIR__, "Results")
+    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
     mkpath(results_dir)
     savefig(plt, joinpath(results_dir, "warehouse_graph.png"))
-
-    return plt
-end
+    end
 
 function heatmap_main(matriz::Matrix, title::String)
 
@@ -83,16 +81,14 @@ function heatmap_main(matriz::Matrix, title::String)
         yticks = [1;5:5:num_linhas]             # Opcional: força marcadores de 1 até o número de linhas
     )
 
-    results_dir = joinpath(@__DIR__, "Results")
+    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
     mkpath(results_dir)
 
-    # Gera um nome de arquivo a partir do título (sem espaços/acentos problemáticos)
     filename = replace(title, " " => "_")
-    filename = replace(filename, r"[^\w\-]" => "")  # remove caracteres não alfanuméricos (exceto _ e -)
+    filename = replace(filename, r"[^\w\-]" => "")
 
     savefig(plt, joinpath(results_dir, "heatmap_$(filename).png"))
 
-    return plt
 end
 
 function plot_allocation(x, warehouse)
@@ -174,9 +170,8 @@ function plot_allocation(x, warehouse)
             text("Depot", 7, :white)
             )
 
-    results_dir = joinpath(@__DIR__, "Results")
+    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
     mkpath(results_dir)
     savefig(p, joinpath(results_dir, "allocation.png"))
 
-    return p
 end

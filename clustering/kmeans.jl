@@ -28,7 +28,7 @@ function kmeans_clusters(cooc, k::Int)
         for (sku, cluster) in enumerate(result.assignments)
 
             if cluster == c
-                push!(skus, sku)
+                #push!(skus, sku)
                 total_frequency += cooc.frequency[sku]
             end
 
@@ -37,7 +37,7 @@ function kmeans_clusters(cooc, k::Int)
         average_frequency =
             isempty(skus) ? 0.0 : total_frequency / length(skus)
 
-        push!(clusters, Cluster(skus, average_frequency))
+        #push!(clusters, Cluster(skus, average_frequency))
 
     end
 

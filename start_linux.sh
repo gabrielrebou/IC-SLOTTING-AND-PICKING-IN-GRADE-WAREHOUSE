@@ -10,7 +10,6 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}Iniciando execucao de main.jl...${NC}"
-echo -e "${CYAN}Caso trave em algum processo, pressione Enter para continuar...${NC}"
 
 # Entra na pasta onde o script está, para garantir que main.jl seja encontrado
 cd "$(dirname "$0")"

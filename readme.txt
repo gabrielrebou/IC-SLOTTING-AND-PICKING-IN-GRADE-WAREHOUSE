@@ -41,11 +41,36 @@ candidate_fraction            # fração de candidatos a serem considerados para
 als_factor                    # fator de regularização para o ALS (teste com 0.001, 0.01, 0.1, 1)
 als_k                         # número de fatores latentes para o ALS (teste com 5, 10, 20, 30, 50)
 distance_factor         
-    #distance_factor → 0 → nenhuma influência espacial (W = I);
+    #distance_factor lim → 0 → nenhuma influência espacial (W -> I);
     #distance_factor pequeno → apenas vizinhos imediatos influenciam;
     #distance_factor intermediário → influência regional;
-    #distance_factor → ∞ → todas as posições se influenciam igualmente.
+    #distance_factor lim → ∞ → todas as posições se influenciam igualmente.
 message_passing_factor        # fator de influência da matriz de coocorrência na matriz de similaridade final (teste com 0.1, 0.5, 0.9)
 max_variety                   # número máximo de variedades de SKUs por prateleira
+piker_capacity                # capacideda de cada piker (Obs: capacidade = volume*quantidade)
 #k = 4 # Número de clusters para o K-means
 #__________________________________________________________________________________________________________________
+
+rodar primeiro tem um piker para cada pedido
+para cada pedido rodar tsp, montar a rota de cada pikerfunção objt vai ser a soma das distancias e quantidade de pikers
+depois iniciar as economias
+
+scr
+    ABC
+    clustering
+    descartargeneral_functions
+    inventory_sizing
+    picking
+    Results
+    Results_compare
+    slotting
+    warehouse
+    config.jl
+    main.jl
+    packages_linux.sh
+    packages_windows.exe
+    packages_windows.ps1
+    readme.txt
+    start_linux.sh
+    start_windows.exe
+    start_windows.ps1
