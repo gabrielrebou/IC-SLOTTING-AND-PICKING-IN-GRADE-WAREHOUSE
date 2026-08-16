@@ -88,7 +88,7 @@ function print_allocation(warehouse::Warehouse, instance::Instance, cooc::Cooccu
     println("Resultados salvos em: ", results_path)
 end
 
-function print_pickers(pickers_route::Vector{Vector{Pickers}}, do_allocation::Bool, do_mensage_passing::Bool, data_name::String)
+function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_mensage_passing::Bool, data_name::String, data_id::Int, allocation_time, allocation_bytes,route_time, route_bytes, cw_time, cw_bytes)
 
     results_dir = joinpath(@__DIR__, "..", "Results", "picker")
     mkpath(results_dir)
@@ -100,14 +100,12 @@ function print_pickers(pickers_route::Vector{Vector{Pickers}}, do_allocation::Bo
 
     # "w" sobrescreve o arquivo se já existir, ou cria um novo
     open(results_path, "w") do io
-        for group in pickers_route
-            for picker in group
+            for picker in pickers_route
                 sum_pickers += 1
-                println(io, "Rota do Picker",sum_pickers,": ", picker.picker_rout)
+                println(io, "Rota do Picker ",sum_pickers,": ", picker.picker_rout)
                 
                 distance += sum(picker.distance)
             end
-        end
 
         println(io, "")
         println(io, "Caso de teste: ", data_name)
@@ -117,5 +115,16 @@ function print_pickers(pickers_route::Vector{Vector{Pickers}}, do_allocation::Bo
         println(io, "")
         println(io, "Distancia Total: ", distance)
         println(io, "Quantidade de Pickers: ", sum_pickers)
+    end
+
+    dir_path = joinpath(@__DIR__, "..", "Results_compare") 
+    file_path = joinpath(dir_path, "compare.csv")
+
+    if !isdir(dir_path)
+        mkpath(dir_path)
+    end
+
+    open(file_path, "a") do io
+        println(io, data_id,",",data_name,",",do_allocation,",",do_mensage_passing,",",allocation_time,",",allocation_bytes,",",route_time,",",route_bytes,",",cw_time,",",cw_bytes,",",distance,",",sum_pickers)
     end
 end

@@ -61,12 +61,11 @@ function allocation_main(do_allocation, do_mensage_passing, data_id, data_names,
         heatmap_main(Distance_matrix, "Matriz de Distância")
         heatmap_main(S_hat, "Matriz S_hat do ALS")
         plot_allocation(allocations, warehouse)
-
-        if isfile(allocation_file)
-            return deserialize(allocation_file)
-        else
-            @warn "Arquivo de alocacao nao encontrado: $allocation_file"
-            return nothing
-       end
+    end
+    if isfile(allocation_file)
+        return deserialize(allocation_file)
+    else
+        @warn "Arquivo de alocacao nao encontrado: $allocation_file"
+        return nothing
     end
 end
