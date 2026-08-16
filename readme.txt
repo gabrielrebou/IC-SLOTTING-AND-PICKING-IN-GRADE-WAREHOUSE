@@ -7,6 +7,13 @@ Para rodar em Linux use esses dois comandos
 chmod +x start_linux.sh
 ./start_linux.sh
 
+
+Para instalar no Window dê duplo clique em:
+packages_windows.exe
+
+Para rodar em Windows dê duplo clique em:
+start_windows.exe
+
 #__________________________________________________________________________________________________________________
 # observaçôes:
 o ALS não precisa substituir um algoritmo de otimização.
