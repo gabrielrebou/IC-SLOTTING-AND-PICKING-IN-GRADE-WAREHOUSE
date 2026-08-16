@@ -1,7 +1,7 @@
 
 using Statistics
 
-function print_allocation(warehouse::Warehouse, instance::Instance, cooc::CooccurrenceMatrix, skus::Vector{SKU}, sparse_matrix, S_hat::Matrix, P::Matrix, W::Matrix, S_hat_hat::Matrix, allocations::Matrix, do_mensage_passing::Bool)
+function print_allocation(warehouse::Warehouse, instance::Instance, cooc::CooccurrenceMatrix, skus::Vector{SKU}, sparse_matrix, S_hat::Matrix, P::Matrix, W::Matrix, S_hat_hat::Matrix, allocations::Matrix, do_message_passing::Bool)
     # Garante que a pasta Results existe (mesmo nível de main.jl, dentro de scr)
     results_dir = joinpath(@__DIR__, "..", "Results", "allocation")
     mkpath(results_dir)
@@ -37,7 +37,7 @@ function print_allocation(warehouse::Warehouse, instance::Instance, cooc::Cooccu
         end
         
         println(io, "")
-        if do_mensage_passing
+        if do_message_passing
             println(io, "extremidades das matrizes:")
             println(io, "S_hat: ", extrema(S_hat))
             println(io, "S_hat * P: ", extrema(S_hat * P))
@@ -88,7 +88,7 @@ function print_allocation(warehouse::Warehouse, instance::Instance, cooc::Cooccu
     println("Resultados salvos em: ", results_path)
 end
 
-function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_mensage_passing::Bool, data_name::String, data_id::Int, allocation_time, allocation_bytes,route_time, route_bytes, cw_time, cw_bytes)
+function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_abc::Bool, do_message_passing::Bool, do_cw::Bool, data_name::String, data_id::Int, allocation_time, allocation_bytes,route_time, route_bytes, cw_time, cw_bytes)
 
     results_dir = joinpath(@__DIR__, "..", "Results", "picker")
     mkpath(results_dir)
@@ -110,9 +110,6 @@ function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_m
         println(io, "")
         println(io, "Caso de teste: ", data_name)
         println(io, "")
-        println(io, "allocation: ", do_allocation)
-        println(io, "message passage: ", do_mensage_passing)
-        println(io, "")
         println(io, "Distancia Total: ", distance)
         println(io, "Quantidade de Pickers: ", sum_pickers)
     end
@@ -125,6 +122,6 @@ function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_m
     end
 
     open(file_path, "a") do io
-        println(io, data_id,",",data_name,",",do_allocation,",",do_mensage_passing,",",allocation_time,",",allocation_bytes,",",route_time,",",route_bytes,",",cw_time,",",cw_bytes,",",distance,",",sum_pickers)
+            println(io, data_id,",",data_name,",",do_allocation,",",do_abc,",",do_message_passing,",",do_cw,",",allocation_time,",",allocation_bytes,",",route_time,",",route_bytes,",",cw_time,",",cw_bytes,",",distance,",",sum_pickers)
     end
 end

@@ -1,6 +1,3 @@
-using Plots
-using Graphs
-
 function warehouse_graph(warehouse::Warehouse)
     # Criar o grafo baseado no número de localizações + depósito
     n_nos = length(warehouse.locations) + 1

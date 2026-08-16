@@ -55,22 +55,41 @@ rodar primeiro tem um piker para cada pedido
 para cada pedido rodar tsp, montar a rota de cada pikerfunção objt vai ser a soma das distancias e quantidade de pikers
 depois iniciar as economias
 
-scr
-    ABC
-    clustering
-    descartargeneral_functions
-    inventory_sizing
-    picking
-    Results
-    Results_compare
-    slotting
-    warehouse
-    config.jl
-    main.jl
-    packages_linux.sh
-    packages_windows.exe
-    packages_windows.ps1
-    readme.txt
-    start_linux.sh
-    start_windows.exe
-    start_windows.ps1
+
+src/
+│
+├── ABC/                       # Análise e classificação de SKUs
+│   ├── cluster_abc.jl         # Agrupamento baseado na curva ABC
+│   └── sku_abc.jl             # Classificação de produtos (SKUs)
+│
+├── clustering/                # Algoritmos de agrupamento de dados
+│   ├── cooccurrence.jl        # Análise de coocorrência de itens
+│   └── kmeans.jl              # Implementação/configuração do algoritmo K-Means
+│
+├── data/                      # Instâncias e dados de entrada do problema
+│   ├── readme.txt             # Documentação específica das instâncias
+│   └── SLAPRP_Guo_small_*.txt # Instâncias do problema (O50, O100, O200) com variações de alpha
+│
+├── general_functions/         # Funções utilitárias e ferramentas compartilhadas
+│
+├── inventory_sizing/          # Módulos para dimensionamento de inventário
+│
+├── picking/                   # Algoritmos e regras para o processo de coleta (Picking)
+│
+├── Results/                   # [Ignorado] Saídas brutas, logs e resultados gerados
+│
+├── Results_compare/           # [Ignorado] Relatórios e scripts de comparação de resultados
+│
+├── slotting/                  # Estratégias de alocação de produtos em gôndolas (Slotting)
+│
+├── warehouse/                 # Modelagem e parametrização do layout do armazém
+│
+├── .gitignore                 # Filtros de arquivos e pastas para o Git
+├── config.jl                  # Arquivo central de configuração do projeto
+├── main.jl                    # Ponto de entrada (script principal de execução)
+│
+├── packages_linux.sh          # Instalação de dependências no Linux
+├── packages_windows.exe       # Instalador automatizado para Windows
+├── start_linux.sh             # Script de inicialização rápida no Linux
+├── start_windows.exe          # Executável de inicialização no Windows
+└── readme.txt                 # Este arquivo de documentação

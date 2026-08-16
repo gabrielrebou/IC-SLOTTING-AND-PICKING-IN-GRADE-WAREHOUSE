@@ -24,6 +24,7 @@ const picker_capacity::Int = 10
 
 # (Modificáveis via terminal)
 do_allocation::Bool = false
+do_abc::Bool = false
 do_message_passing::Bool = false
 data_id::Int = 1
 
