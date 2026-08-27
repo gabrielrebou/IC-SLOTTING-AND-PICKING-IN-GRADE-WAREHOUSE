@@ -1,83 +1,108 @@
-function allocation_main(do_allocation, do_abc, do_message_passing, data_id, data_names, n_aisles, n_shelves, capacity, sigma, v_tipico, p_frequency, p_volume, p_quantity, volumetricModule, warehouse_capacity, warehouse_filling_rate, seed, candidate_fraction, als_k, als_factor, distance_factor, message_passing_factor, max_variety)
-    
-    results_dir = joinpath(@__DIR__, "..","Results")
-    allocation_file = joinpath(results_dir, "allocation.txt")
-    
-    if do_allocation || do_message_passing || do_abc
-        
-        # Limpa a pasta Results/allocation (apaga se existir e recria vazia)
-        rm(results_dir, recursive=true, force=true)
-        mkpath(results_dir)
+# src/Slotting/allocation_main.jl
 
-        instance = read_instance(joinpath(@__DIR__, "..", "data", data_names[data_id]))
-        warehouse = create_warehouse(n_aisles, n_shelves, capacity) 
-        #return warehouse{locations, depot}
-        #locations{id, aisle, shelf, capacity}, depot{id, aisle, shelf, capacity}
+function allocation_main(cfg::ExperimentConfig, params::Params)
 
-        depot_distance = compute_depot_distance(warehouse)
-        depot_id = warehouse.depot.id
+    instance = read_instance(joinpath(@__DIR__, "..", "..", "Data", params.data_names[cfg.data_id]))
+    warehouse = create_warehouse(cfg,params.warehouse_config)
+    depot_distance = compute_depot_distance(cfg,warehouse)
+    depot_id = warehouse.depot.id
 
-        cooc = cooccurrence_matrix(instance.orders, instance.n_skus)
-        #return cooc{matrix[Int], frequency[Int]}
-        skus = generate_skus(
-            sigma, v_tipico, p_frequency, p_volume, p_quantity, 
-            volumetricModule, capacity, warehouse_capacity, 
-            warehouse_filling_rate, instance, seed
+    cooc = cooccurrence_matrix(instance.orders, instance.n_skus)
+    skus = generate_skus(params, instance, warehouse)
+
+    distance_matrix = build_distance_matrix(cfg,warehouse.locations)
+
+    empty_matrix = Matrix{Float64}(undef, 0, 0)
+    sparse_matrix = U = V = S_hat = W = P = S_hat_hat = empty_matrix
+
+    if cfg.allocation_method == ABC
+
+        classes = abc_skus(skus)
+        allocations = abc_allocation(skus, classes, warehouse, depot_distance, params.allocation.max_variety)
+
+    elseif cfg.allocation_method == ABC_HEURISTIC
+
+        classes = abc_skus(skus)
+        allocations = abc_allocation_heuristic(
+            skus, classes, cooc, warehouse, distance_matrix, depot_distance, params.allocation.max_variety
         )
-        #return skus[SKU{frequency, quantity, volume}]
 
-        Distance_matrix = build_distances(warehouse.locations)
-        #return Distance_matrix{matrix[Float64], row_indices[Int], col_indices[Int]}
-        if do_abc
-            classes, order = abc_skus(skus)
-            depot_distance = compute_depot_distance(warehouse)
-            allocations = abc_allocation(skus,classes,cooc,warehouse,Distance_matrix,depot_distance)
-            serialize(allocation_file, (instance, warehouse, depot_distance, depot_id, cooc, skus, [0 0], [0 0], [0 0], [0 0], Distance_matrix, [0 0], [0 0], [0 0], allocations))
-        else
-            sparse_matrix = build_sparse_matrix(skus, warehouse, candidate_fraction)
-            #return sparse_matrix{matrix[Float64], row_indices[Int], col_indices[Int]}
-            U, V = als(sparse_matrix; k=als_k, λ=als_factor, maxiter=100, tol=1e-4, seed=seed)
-            #return U[rows, cols], V[rows, cols]
-            S_hat = U * V'
-            if do_message_passing
-                W = correlation_distances(Distance_matrix, distance_factor)
-                #return W{matrix[Float64], row_indices[Int], col_indices[Int]}
-                P = norm_cooccurrence(cooc.matrix)
-                #return P{matrix[Float64], row_indices[Int], col_indices[Int]}
-                S_hat_hat = (1-message_passing_factor) * S_hat + message_passing_factor * W * S_hat * P
-                # depois tentar S_hat_hat = α * S_hat + β * S_hat * P + γ * W * S_hat + δ * W * S_hat * P
-                # com α+β+γ+δ=1.
-                allocations = allocate(S_hat_hat, skus, warehouse, max_variety)
-                #return allocations{matrix[Int], row_indices[Int], col_indices[Int]}
-                if isempty(allocations)
-                    return allocations
-                end
-                serialize(allocation_file, (instance, warehouse, depot_distance, depot_id, cooc, skus, sparse_matrix, U, V, S_hat, Distance_matrix, W, P, S_hat_hat, allocations))
-                print_allocation(warehouse, instance, cooc, skus, sparse_matrix, S_hat, P, W, S_hat_hat, allocations, do_message_passing)
-                heatmap_main(P, "Matriz de Coocorrência Normalizada")
-                heatmap_main(W, "Matriz de Correlação de Distância")
-                heatmap_main(S_hat_hat, "Matriz S_hat_hat do Message Passing")
-            else
-                allocations = allocate(S_hat, skus, warehouse, max_variety)
-                #return allocations{matrix[Int], row_indices[Int], col_indices[Int]}
-                if isempty(allocations)
-                    return allocations
-                end
-                serialize(allocation_file, (instance, warehouse, depot_distance, depot_id, cooc, skus, sparse_matrix, U, V, S_hat, Distance_matrix, [0 0], [0 0], [0 0], allocations))
-                print_allocation(warehouse, instance, cooc, skus, sparse_matrix, S_hat, [0 0], [0 0], [0 0], allocations, do_message_passing)
-            end
-            heatmap_main(S_hat, "Matriz S_hat do ALS")
-        end
+    elseif cfg.allocation_method == ALS
 
-        warehouse_graph(warehouse)
-        heatmap_main(cooc.matrix, "Matriz de Coocorrência")
-        heatmap_main(Distance_matrix, "Matriz de Distância")
-        plot_allocation(allocations, warehouse)
-    end
-    if isfile(allocation_file)
-        return deserialize(allocation_file)
+        sparse_matrix = build_sparse_matrix(skus, warehouse, params.allocation.candidate_fraction)
+        U, V = als(
+            sparse_matrix;
+            k = params.allocation.als_k,
+            λ = params.allocation.als_factor,
+            maxiter = 100,
+            tol = 1e-4,
+            seed = params.sku_generation.seed
+        )
+        S_hat = U * V'
+        allocations = als_allocate(S_hat, skus, warehouse, params.allocation.max_variety)
+
+    elseif cfg.allocation_method == MESSAGE_PASSING
+
+        sparse_matrix = build_sparse_matrix(skus, warehouse, params.allocation.candidate_fraction)
+        U, V = als(
+            sparse_matrix;
+            k = params.allocation.als_k,
+            λ = params.allocation.als_factor,
+            maxiter = 100,
+            tol = 1e-4,
+            seed = params.sku_generation.seed
+        )
+        S_hat = U * V'
+
+        W = correlation_distances(distance_matrix, params.allocation.distance_factor)
+        P = norm_cooccurrence(cooc.matrix)
+        S_hat_hat = (1 - params.allocation.message_passing_factor) * S_hat +
+                    params.allocation.message_passing_factor * W * S_hat * P
+
+        allocations = als_allocate(S_hat_hat, skus, warehouse, params.allocation.max_variety)
+
     else
-        @warn "Arquivo de alocacao nao encontrado: $allocation_file"
-        return nothing
+        error("Metodo de alocacao desconhecido: $(cfg.allocation_method)")
+    end
+
+    result = (;
+        instance, warehouse, depot_distance, depot_id, cooc, skus,
+        sparse_matrix, U, V, S_hat, distance_matrix, W, P, S_hat_hat,
+        allocations
+    )
+
+    if !isempty(allocations)
+        report_allocation(cfg, result)
+    end
+
+    return result
+end
+
+# Efeitos colaterais (prints, heatmaps, gráficos) isolados numa função
+# separada, para não misturar cálculo com relatório — e para não gerar
+# nenhum gráfico quando o resultado vier direto do cache.
+function report_allocation(cfg::ExperimentConfig, result)
+
+    do_message_passing = cfg.allocation_method == MESSAGE_PASSING
+
+    print_allocation(
+        result.warehouse, result.instance, result.cooc, result.skus,
+        result.sparse_matrix, result.S_hat, result.P, result.W, result.S_hat_hat,
+        result.allocations, do_message_passing
+    )
+
+    warehouse_graph(result.warehouse)
+    heatmap_main(result.cooc.matrix, "Matriz de Coocorrência")
+    heatmap_main(result.distance_matrix, "Matriz de Distância")
+    plot_allocation(result.allocations, result.warehouse)
+
+    if cfg.allocation_method in (ALS, MESSAGE_PASSING)
+        heatmap_main(result.S_hat, "Matriz S_hat do ALS")
+    end
+
+    if do_message_passing
+        heatmap_main(result.P, "Matriz de Coocorrência Normalizada")
+        heatmap_main(result.W, "Matriz de Correlação de Distância")
+        heatmap_main(result.S_hat_hat, "Matriz S_hat_hat do Message Passing")
     end
 end

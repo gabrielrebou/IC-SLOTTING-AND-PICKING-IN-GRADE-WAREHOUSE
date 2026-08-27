@@ -1,3 +1,8 @@
+# src/General_functions/graphs.jl
+
+using Graphs
+using Plots
+
 function warehouse_graph(warehouse::Warehouse)
     # Criar o grafo baseado no número de localizações + depósito
     n_nos = length(warehouse.locations) + 1
@@ -56,7 +61,7 @@ function warehouse_graph(warehouse::Warehouse)
         annotate!(x[i], y[i] - 0.3, text(labels[i], 8, :center))
     end
 
-    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
+    results_dir::String = joinpath(@__DIR__, "..", "..", "Results_cache", "graphs")
     mkpath(results_dir)
     savefig(plt, joinpath(results_dir, "warehouse_graph.png"))
     end
@@ -78,7 +83,7 @@ function heatmap_main(matriz::Matrix, title::String)
         yticks = [1;5:5:num_linhas]             # Opcional: força marcadores de 1 até o número de linhas
     )
 
-    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
+    results_dir::String = joinpath(@__DIR__, "..", "..", "Results_cache", "graphs")
     mkpath(results_dir)
 
     filename = replace(title, " " => "_")
@@ -167,7 +172,7 @@ function plot_allocation(x, warehouse)
             text("Depot", 7, :white)
             )
 
-    results_dir::String = joinpath(@__DIR__, "..", "Results", "graphs")
+    results_dir::String = joinpath(@__DIR__, "..", "..", "Results_cache", "graphs")
     mkpath(results_dir)
     savefig(p, joinpath(results_dir, "allocation.png"))
 

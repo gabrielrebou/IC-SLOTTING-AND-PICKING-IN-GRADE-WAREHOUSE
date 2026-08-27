@@ -1,11 +1,13 @@
+# src/Inventory_sizing/generate_skus_lognormal.jl
+
 using Random
 using Statistics
 # Fazer esse código foi pura estatística
-function generate_lognormal(v_tipico::Float64, sigma::Float64, n::Int, seed::Int)
+function generate_lognormal(tipic_v::Float64, sigma::Float64, n::Int, seed::Int)
 
     values = Vector{Float64}(undef, n)
 
-    mu = log(v_tipico)
+    mu = log(tipic_v)
     Random.seed!(seed)
     for i in 1:n
         z = randn()
@@ -15,19 +17,7 @@ function generate_lognormal(v_tipico::Float64, sigma::Float64, n::Int, seed::Int
     return values
 end
 
-function generate_skus(
-    sigma::Float64,
-    v_tipico::Float64,
-    p_frequency::Float64,
-    p_volume::Float64,
-    p_quantity::Float64,
-    volumetric_module::Float64,
-    capacity::Int,
-    warehouse_capacity::Int,
-    warehouse_filling_rate::Float64,
-    instance::Instance,
-    seed::Int
-)
+function generate_skus(params::Params, instance::Instance, warehouse::Warehouse)
 
     n_skus = instance.n_skus
 
@@ -40,21 +30,21 @@ function generate_skus(
     end
 
     # Volume Lognormal dos SKUs
-    Random.seed!(seed)
+    Random.seed!(params.sku_generation.seed)
     raw_volume = Vector{Float64}(undef, n_skus)
-    raw_volume = generate_lognormal(v_tipico, sigma, n_skus, seed)
+    raw_volume = generate_lognormal(params.sku_generation.tipic_v, params.sku_generation.sigma, n_skus, params.sku_generation.seed)
     for i in eachindex(raw_volume)
 
         raw_volume[i] =
             clamp(
                 raw_volume[i],
-                volumetric_module,
-                capacity
+                params.sku_generation.volumetric_module,
+                params.warehouse_config.shelf_capacity
             )
 
         raw_volume[i] =
-            round(raw_volume[i] / volumetric_module) *
-            volumetric_module
+            round(raw_volume[i] / params.sku_generation.volumetric_module) *
+            params.sku_generation.volumetric_module
 
     end
 
@@ -64,9 +54,9 @@ function generate_skus(
     # garante atender pedidos
     quantity = max.(frequency, 1)
 
-    max_volume = warehouse_capacity * warehouse_filling_rate
+    max_volume = warehouse.capacity * params.warehouse_config.filling_rate
     current_volume = sum(quantity .* volumes)
-    if current_volume > warehouse_capacity
+    if current_volume > warehouse.capacity
         error("Capacidade insuficiente para atender demanda mínima")
     end
 
@@ -94,15 +84,15 @@ function generate_skus(
             i = candidates[j]
 
             demand_factor =
-                (frequency[i] + 1)^p_frequency
+                (frequency[i] + 1)^params.sku_generation.p_frequency
 
 
             volume_factor =
-                volumes[i]^(-p_volume)
+                volumes[i]^(-params.sku_generation.p_volume)
 
 
             stock_penalty =
-                (quantity[i] + 1)^(-p_quantity)
+                (quantity[i] + 1)^(-params.sku_generation.p_quantity)
 
 
             weights[j] =
@@ -147,6 +137,7 @@ function generate_skus(
     for i in 1:n_skus
 
         result[i] = SKU(
+            i,
             frequency[i],
             quantity[i],
             volumes[i]

@@ -1,9 +1,10 @@
+# src/General_functions/prints.jl
 
 using Statistics
 
 function print_allocation(warehouse::Warehouse, instance::Instance, cooc::CooccurrenceMatrix, skus::Vector{SKU}, sparse_matrix, S_hat::Matrix, P::Matrix, W::Matrix, S_hat_hat::Matrix, allocations::Matrix, do_message_passing::Bool)
     # Garante que a pasta Results existe (mesmo nível de main.jl, dentro de scr)
-    results_dir = joinpath(@__DIR__, "..", "Results", "allocation")
+    results_dir = joinpath(@__DIR__, "..", "..", "Results_cache", "allocation")
     mkpath(results_dir)
 
     results_path = joinpath(results_dir, "Results.txt")
@@ -63,65 +64,29 @@ function print_allocation(warehouse::Warehouse, instance::Instance, cooc::Cooccu
         
     end
     
-    #matriz esparsa
-    #println("\nMatriz esparsa: ")
-    #display(sparse_matrix)
-    #println("")
-    
-    #ALS
-    #println("\nMatriz S_hat do ALS: ")
-    #display(S_hat)
-    #println("\nMatriz S_hat_hat do message passing: ")
-    #display(S_hat_hat)
-    
-    # Exibir os clusters e suas características
-    #println("\nNúmero de clusters: ", length(kmeans_result.clusters))
-    #for (i, cluster) in enumerate(kmeans_result.clusters)
-    
-    #    println("Cluster ", i)
-    #    println("Quantidade de SKUs: ", length(cluster.skus))
-    #    println("Frequencia media: ", round(cluster.average_frequency, digits=2))
-    #    println("SKUs: ", cluster.skus)
-    #    println("Coocorrência interna: ", internal_cooccurrence(cluster, cooc))
-    #end
-    
     println("Resultados salvos em: ", results_path)
 end
 
-function print_pickers(pickers_route::Vector{Pickers}, do_allocation::Bool, do_abc::Bool, do_message_passing::Bool, do_cw::Bool, data_name::String, data_id::Int, allocation_time, allocation_bytes,route_time, route_bytes, cw_time, cw_bytes)
-
-    results_dir = joinpath(@__DIR__, "..", "Results", "picker")
+function print_pickers(
+    cfg::ExperimentConfig,
+    pickers_route::Vector{Pickers},
+    data_name::String,
+    distance::Float64,
+    sum_pickers::Int
+)
+    folder_name = "$(cfg.data_id)-$(cfg.allocation_method)-$(cfg.routing_heuristic)-$(cfg.merge_strategy)"
+    results_dir = joinpath(@__DIR__, "..", "..", "Results_cache", folder_name, "picker")
     mkpath(results_dir)
-
     results_path = joinpath(results_dir, "Results.txt")
 
-    distance = 0.0
-    sum_pickers = 0
-
-    # "w" sobrescreve o arquivo se já existir, ou cria um novo
     open(results_path, "w") do io
-            for picker in pickers_route
-                sum_pickers += 1
-                println(io, "Rota do Picker ",sum_pickers,": ", picker.picker_rout)
-                
-                distance += sum(picker.distance)
-            end
-
+        for (i, picker) in enumerate(pickers_route)
+            println(io, "Rota do Picker ", i, ": ", picker.picker_rout)
+        end
         println(io, "")
         println(io, "Caso de teste: ", data_name)
         println(io, "")
         println(io, "Distancia Total: ", distance)
         println(io, "Quantidade de Pickers: ", sum_pickers)
-    end
-
-    dir_path = joinpath(@__DIR__, "..", "Results_compare") 
-    file_path = joinpath(dir_path, "compare.csv")
-
-    if !isdir(dir_path)
-        mkpath(dir_path)
-    end
-
-    open(file_path, "a") do io
-            println(io, data_id,",",data_name,",",do_allocation,",",do_abc,",",do_message_passing,",",do_cw,",",allocation_time,",",allocation_bytes,",",route_time,",",route_bytes,",",cw_time,",",cw_bytes,",",distance,",",sum_pickers)
     end
 end
