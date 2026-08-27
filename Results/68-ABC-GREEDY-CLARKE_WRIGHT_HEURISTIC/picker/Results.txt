@@ -1,0 +1,8 @@
+Rota do Picker 1: [0, 41, 81, 21, 1, 83, 5, 62, 93, 26, 6, 82, 44, 43, 3, 61, 4, 23, 37, 0]
+Rota do Picker 2: [0, 25, 63, 83, 82, 7, 4, 81, 65, 26, 24, 42, 61, 41, 21, 1, 5, 43, 44, 3, 6, 23, 62, 0]
+Rota do Picker 3: [0, 1, 21, 61, 3, 23, 43, 5, 41, 81, 83, 7, 64, 4, 24, 8, 26, 6, 27, 46, 45, 25, 44, 63, 0]
+
+Caso de teste: SLAPRP_Guo_small_O50_alpha0.2_v7.txt
+
+Distancia Total: 396.0
+Quantidade de Pickers: 3
