@@ -5,7 +5,6 @@ Projeto para experimentação de métodos de *slotting* (alocação de SKUs) e *
 ## Sumário
 
 - [Instalação](#instalação)
-- [Execução](#execução)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Variáveis de configuração](#variáveis-de-configuração)
 - [Estratégias](#estratégias)
@@ -25,19 +24,6 @@ chmod +x packages_linux.sh
 ### Windows
 
 Dê duplo clique em `packages_windows.exe`.
-
-## Execução
-
-### Linux
-
-```bash
-chmod +x start_linux.sh
-./start_linux.sh
-```
-
-### Windows
-
-Dê duplo clique em `start_windows.exe`.
 
 ## Estrutura do projeto
 
