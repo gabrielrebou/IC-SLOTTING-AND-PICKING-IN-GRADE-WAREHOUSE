@@ -63,23 +63,18 @@ function run_experiment_with_allocation(
     end
     
     max_route, route_time, route_bytes = @timed route_main(cfg,params,alloc_result)
-    
-    all_pickers = reduce(vcat, max_route.pickers)
-    distance = max_route.distance
-    sum_pickers = max_route.sum_pickers
-    
+
     if cfg.merge_strategy == NO_HEURISTIC
         report_allocation(cfg,alloc_result)
-        print_pickers(cfg, all_pickers, params.data_names[cfg.data_id], distance, sum_pickers)
-        save_files(cfg, params.data_names[cfg.data_id], allocation_time, allocation_bytes,route_time, route_bytes,0,0, distance, sum_pickers)
-        
+        print_pickers(cfg, max_route.pickers, params.data_names[cfg.data_id], max_route.distance, max_route.sum_pickers)
+        save_files(cfg, params.data_names[cfg.data_id], allocation_time, allocation_bytes, route_time, route_bytes, 0, 0, max_route.distance, max_route.sum_pickers)
+
     else
         merged_pickers, merge_time, merge_bytes = @timed merge_main(cfg,params,alloc_result,max_route)
-        
-        distance, sum_pickers = calculate_picker_results(merged_pickers.pickers)
+
         report_allocation(cfg,alloc_result)
-        print_pickers(cfg, merged_pickers.pickers, params.data_names[cfg.data_id], distance, sum_pickers)
-        save_files(cfg, params.data_names[cfg.data_id], allocation_time, allocation_bytes,route_time, route_bytes, merge_time, merge_bytes, distance, sum_pickers)
+        print_pickers(cfg, merged_pickers.pickers, params.data_names[cfg.data_id], merged_pickers.distance, merged_pickers.sum_pickers)
+        save_files(cfg, params.data_names[cfg.data_id], allocation_time, allocation_bytes, route_time, route_bytes, merge_time, merge_bytes, merged_pickers.distance, merged_pickers.sum_pickers)
     end
 
     archive_results(cfg)
